@@ -130,6 +130,13 @@
         .today-xp-label { font-size: 12px; color: rgba(255,255,255,0.85); }
         .today-xp-val { font-size: 15px; font-weight: 700; color: white; }
 
+        /* ===== PROFILE ===== */
+        .user-profile-row { display: flex; align-items: center; gap: .6rem; padding: .45rem 0 0; }
+        .user-avatar { width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.25); border: 1.5px solid rgba(255,255,255,0.4); color: white; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; text-transform: uppercase; }
+        .user-info { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+        .user-name-text { font-size: 13px; font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 240px; }
+        .user-meta-text { font-size: 10px; color: rgba(255,255,255,0.72); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 240px; }
+
         /* ===== MISC ===== */
         .screen-center { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; gap: 1rem; color: #6b7280; text-align: center; padding: 2rem; }
         .spinner { width: 40px; height: 40px; border: 3px solid #e5e7eb; border-top-color: #667eea; border-radius: 50%; animation: spin .8s linear infinite; }
@@ -143,7 +150,13 @@
 <div id="app">
     <header class="app-header">
         <h1>📋 Personal Planner</h1>
-        <p>Управляйте спринтами, неделями и задачами</p>
+        <div class="user-profile-row" id="user-profile-row" style="display:none">
+            <div class="user-avatar" id="user-avatar">?</div>
+            <div class="user-info">
+                <span class="user-name-text" id="user-name-text"></span>
+                <span class="user-meta-text" id="user-meta-text"></span>
+            </div>
+        </div>
         <div class="stats-bar" id="stats-bar" style="display:none">
             <span class="level-badge" id="level-badge">Ур.1 Новичок</span>
             <div class="xp-bar-wrap">
@@ -189,6 +202,24 @@ function saveHabitTpl(v) { localStorage.setItem('pp_ht_'+USER_ID, JSON.stringify
 let USER_ID = null;
 const D = { sprint:null, week:null, daily:null, stats:null, history:null };
 const UI = { view:'daily', showSummary:false };
+
+// ===== PROFILE =====
+function renderProfileRow(profile) {
+    if (!profile || profile.error) return;
+    const displayName = [profile.firstName, profile.lastName].filter(Boolean).join(' ') || profile.username || 'Пользователь';
+    document.getElementById('user-avatar').textContent = displayName.charAt(0).toUpperCase();
+    document.getElementById('user-name-text').textContent = displayName;
+    const parts = [];
+    if (profile.username) parts.push('@' + profile.username);
+    if (profile.createdAt) {
+        const d = new Date(profile.createdAt);
+        parts.push('с ' + d.toLocaleDateString('ru-RU', { day:'numeric', month:'short', year:'numeric' }));
+    }
+    document.getElementById('user-meta-text').textContent = parts.join(' · ');
+    document.getElementById('user-profile-row').style.display = 'flex';
+    if (profile.level) prevLevel = profile.level;
+    updateStatsBar(profile);
+}
 
 // ===== STATS BAR =====
 function updateStatsBar(stats) {
@@ -663,17 +694,24 @@ function hideSummary(){ UI.showSummary=false; renderDaily(); }
 function init() {
     const params = new URLSearchParams(window.location.search);
     let uid = params.get('user_id');
-    if (!uid && window.Telegram && window.Telegram.WebApp) {
+    let tgUser = null;
+    if (window.Telegram && window.Telegram.WebApp) {
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
         const u = window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user;
-        if (u) uid = String(u.id);
+        if (u) { tgUser = u; if (!uid) uid = String(u.id); }
     }
     if (!uid) {
         uid = localStorage.getItem('pp_local_uid');
         if (!uid) { uid='local_'+Date.now().toString(36); localStorage.setItem('pp_local_uid', uid); }
     }
     USER_ID = uid;
+    apiPost('/api/user/register', {
+        telegramId: uid,
+        firstName: tgUser ? (tgUser.first_name||'') : '',
+        lastName:  tgUser ? (tgUser.last_name||'')  : '',
+        username:  tgUser ? (tgUser.username||'')   : '',
+    }).then(renderProfileRow).catch(() => {});
     loadAllData();
 }
 document.addEventListener('DOMContentLoaded', init);

@@ -178,6 +178,38 @@ app.get('/api/user/:userId', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// Регистрация / обновление профиля при открытии приложения
+app.post('/api/user/register', async (req, res) => {
+  try {
+    const { telegramId, username, firstName, lastName } = req.body;
+    if (!telegramId) return res.status(400).json({ error: 'telegramId required' });
+    const now = new Date();
+    const user = await User.findOneAndUpdate(
+      { telegramId: String(telegramId) },
+      {
+        $set: { username: username||'', firstName: firstName||'', lastName: lastName||'', lastActiveDate: now },
+        $setOnInsert: { createdAt: now, xp: 0, level: 1, streak: 0 }
+      },
+      { upsert: true, new: true }
+    );
+    const xp = user.xp || 0;
+    const { current, next } = getLevelInfo(xp);
+    res.json({
+      telegramId: user.telegramId,
+      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      xp,
+      level: current.lvl,
+      levelName: current.name,
+      streak: user.streak || 0,
+      currentLevelXP: current.xp,
+      nextLevelXP: next ? next.xp : null,
+      createdAt: user.createdAt,
+    });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // Статистика пользователя (XP, уровень, стрик)
 app.get('/api/user-stats/:userId', async (req, res) => {
   try {
