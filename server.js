@@ -160,19 +160,24 @@ app.get('/api/user/:userId', async (req, res) => {
 // Создать/обновить спринт
 app.post('/api/sprint', async (req, res) => {
   try {
-    const { userId, title, goals } = req.body;
-    const startDate = new Date('2026-01-01');
-    const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + 90);
+    const { userId, title, goals, events, startDate } = req.body;
+    const sDate = startDate ? new Date(startDate) : new Date();
+    const eDate = new Date(sDate);
+    eDate.setDate(eDate.getDate() + 90);
 
     const sprint = await Sprint.findOneAndUpdate(
       { userId },
       {
         userId,
         title,
-        goals,
-        startDate,
-        endDate
+        goals: goals || [],
+        events: (events || []).map(ev => ({
+          date: new Date(ev.date),
+          title: ev.title,
+          description: ev.description || ''
+        })),
+        startDate: sDate,
+        endDate: eDate
       },
       { upsert: true, new: true }
     );
@@ -208,27 +213,37 @@ app.post('/api/sprint/:sprintId/event', async (req, res) => {
   }
 });
 
-// Создать неделю с задачами
+// Создать/обновить неделю с задачами (upsert по userId + weekNumber)
 app.post('/api/week', async (req, res) => {
   try {
-    const { userId, sprintId, weekNumber, tasks } = req.body;
-    const startDate = new Date('2026-01-01');
-    startDate.setDate(startDate.getDate() + (weekNumber - 1) * 7);
-    
-    const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + 6);
+    const { userId, sprintId, weekNumber, tasks, startDate, endDate } = req.body;
 
-    const week = await Week.create({
-      userId,
-      sprintId,
-      weekNumber,
-      startDate,
-      endDate,
-      tasks: tasks.map(t => ({
-        id: Date.now().toString(),
-        ...t
-      }))
-    });
+    const wStart = startDate ? new Date(startDate) : (() => {
+      const d = new Date(); d.setDate(d.getDate() - ((d.getDay() || 7) - 1)); d.setHours(0,0,0,0); return d;
+    })();
+    const wEnd = endDate ? new Date(endDate) : (() => {
+      const d = new Date(wStart); d.setDate(d.getDate() + 6); d.setHours(23,59,59,999); return d;
+    })();
+
+    const week = await Week.findOneAndUpdate(
+      { userId, weekNumber },
+      {
+        userId,
+        sprintId: sprintId || undefined,
+        weekNumber,
+        startDate: wStart,
+        endDate: wEnd,
+        tasks: (tasks || []).map(t => ({
+          id: t.id || (Date.now().toString() + Math.random().toString(36).slice(2)),
+          title: t.title,
+          priority: t.priority || 'medium',
+          category: t.category || '',
+          completed: t.completed || false,
+          createdAt: t.createdAt ? new Date(t.createdAt) : new Date()
+        }))
+      },
+      { upsert: true, new: true }
+    );
 
     res.json(week);
   } catch (error) {
@@ -249,7 +264,7 @@ app.get('/api/week/:weekId', async (req, res) => {
 // Получить текущую неделю пользователя
 app.get('/api/week/current/:userId', async (req, res) => {
   try {
-    const now = new Date('2026-01-15'); // для примера
+    const now = new Date();
     const week = await Week.findOne({
       userId: req.params.userId,
       startDate: { $lte: now },
@@ -261,19 +276,24 @@ app.get('/api/week/current/:userId', async (req, res) => {
   }
 });
 
-// Создать ежедневные задачи
+// Создать/обновить ежедневные задачи
 app.post('/api/daily-task', async (req, res) => {
   try {
-    const { userId, weekId, date, mainTasks, habits } = req.body;
-    
+    const { userId, weekId, date, mainTasks, habits, metrics, insight } = req.body;
+    const d = new Date(date);
+    const dayStart = new Date(d); dayStart.setHours(0,0,0,0);
+    const dayEnd   = new Date(d); dayEnd.setHours(23,59,59,999);
+
     const dailyTask = await DailyTask.findOneAndUpdate(
-      { userId, date: new Date(date) },
+      { userId, date: { $gte: dayStart, $lte: dayEnd } },
       {
         userId,
-        weekId,
-        date: new Date(date),
-        mainTasks,
-        habits
+        weekId: weekId || undefined,
+        date: dayStart,
+        mainTasks: mainTasks || [],
+        habits: habits || [],
+        metrics: metrics || { water: 0, steps: 0, calories: 0 },
+        insight: insight || ''
       },
       { upsert: true, new: true }
     );

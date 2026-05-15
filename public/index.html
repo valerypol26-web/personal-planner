@@ -3,378 +3,590 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Personal Planner - Telegram Web App</title>
+    <title>Personal Planner</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-                sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            background: #f3f4f6;
-        }
-        #root {
-            min-height: 100vh;
-        }
-        .loading {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            font-size: 16px;
-            color: #6b7280;
-        }
-        .app {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 0;
-            background: #ffffff;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        .app-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 2rem 1rem;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        .app-header h1 {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-        .app-header p {
-            font-size: 12px;
-            opacity: 0.9;
-            margin-bottom: 1rem;
-        }
-        .app-nav {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1px;
-            background: #e5e7eb;
-            padding: 1px;
-            border-bottom: 1px solid #d1d5db;
-        }
-        .nav-button {
-            padding: 1rem;
-            border: none;
-            background: white;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            font-weight: 500;
-            color: #6b7280;
-            transition: all 0.3s ease;
-        }
-        .nav-button.active {
-            background: #f3f4f6;
-            color: #667eea;
-            border-bottom: 3px solid #667eea;
-        }
-        .nav-button .icon {
-            font-size: 20px;
-        }
-        .app-content {
-            flex: 1;
-            padding: 1rem;
-            overflow-y: auto;
-        }
-        .section {
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-        }
-        .section h2 {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: #1f2937;
-        }
-        .input-group {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-        .input-group input,
-        .input-group textarea {
-            flex: 1;
-            padding: 0.75rem;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-        .input-group button {
-            padding: 0.75rem 1.5rem;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        .input-group button:hover {
-            background: #5568d3;
-        }
-        .item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 0.75rem;
-            background: #f9fafb;
-            border-radius: 8px;
-            margin-bottom: 0.5rem;
-        }
-        .item input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-        }
-        .item-text {
-            flex: 1;
-            font-size: 14px;
-            color: #1f2937;
-        }
-        .stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        .stat {
-            background: #f3f4f6;
-            padding: 1rem;
-            border-radius: 8px;
-            text-align: center;
-        }
-        .stat-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: #667eea;
-        }
-        .stat-label {
-            font-size: 12px;
-            color: #6b7280;
-            margin-top: 0.5rem;
-        }
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #e5e7eb;
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 1rem 0;
-        }
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f3f4f6; -webkit-font-smoothing: antialiased; }
+        #app { max-width: 600px; margin: 0 auto; background: #fff; min-height: 100vh; display: flex; flex-direction: column; }
+        .app-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem 1rem 1.25rem; text-align: center; }
+        .app-header h1 { font-size: 22px; font-weight: 700; }
+        .app-header p { font-size: 12px; opacity: 0.85; margin-top: 0.25rem; }
+        .app-nav { display: grid; grid-template-columns: repeat(3, 1fr); background: #e5e7eb; gap: 1px; }
+        .nav-button { padding: 0.875rem 0.5rem; border: none; background: white; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; font-weight: 500; color: #6b7280; }
+        .nav-button.active { color: #667eea; background: #f3f4f6; border-bottom: 2px solid #667eea; }
+        .nav-button .icon { font-size: 18px; }
+        .app-content { flex: 1; padding: 1rem; overflow-y: auto; }
+
+        .section { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
+        .section h2 { font-size: 16px; font-weight: 600; color: #1f2937; margin-bottom: 0.875rem; }
+        .gradient-section { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; }
+        .gradient-section h2, .gradient-section p { color: white; }
+
+        .progress-bar { width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; margin: 0.75rem 0 0.5rem; }
+        .gradient-section .progress-bar { background: rgba(255,255,255,0.25); }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 4px; transition: width 0.4s ease; }
+        .gradient-section .progress-fill { background: rgba(255,255,255,0.85); }
+        .progress-text { font-size: 12px; color: #6b7280; }
+        .gradient-section .progress-text { color: rgba(255,255,255,0.85); }
+
+        .input-group { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
+        .input-group:last-child { margin-bottom: 0; }
+        .input-group input, .input-group textarea { flex: 1; padding: 0.625rem 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; outline: none; font-family: inherit; }
+        .input-group input:focus, .input-group textarea:focus { border-color: #667eea; }
+        .input-group button { padding: 0.625rem 1rem; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; font-size: 13px; white-space: nowrap; }
+        .input-group button:active { background: #5568d3; }
+
+        .btn-primary { display: block; width: 100%; padding: 0.875rem; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 15px; }
+        .btn-secondary { display: block; width: 100%; padding: 0.75rem; background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; border-radius: 10px; cursor: pointer; font-weight: 500; font-size: 14px; }
+
+        .task-item, .habit-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: #f9fafb; border-radius: 8px; margin-bottom: 0.5rem; }
+        .task-item.completed .task-text, .habit-item.completed .habit-text { text-decoration: line-through; opacity: 0.5; }
+        .task-item input[type="checkbox"], .habit-item input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #667eea; flex-shrink: 0; }
+        .task-text, .habit-text { flex: 1; font-size: 14px; color: #1f2937; word-break: break-word; }
+        .priority-badge { font-size: 13px; flex-shrink: 0; }
+        .priority-high { color: #ef4444; }
+        .priority-medium { color: #f59e0b; }
+        .priority-low { color: #9ca3af; }
+        .delete-btn { background: none; border: none; color: #d1d5db; cursor: pointer; font-size: 14px; padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
+        .delete-btn:hover { color: #ef4444; background: #fef2f2; }
+        .streak-badge { font-size: 12px; background: #fef3c7; color: #d97706; padding: 2px 8px; border-radius: 10px; font-weight: 600; flex-shrink: 0; }
+
+        .task-category { margin-bottom: 0.75rem; }
+        .category-title { font-size: 11px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+        .week-title-row { display: flex; align-items: baseline; justify-content: space-between; }
+        .week-title-row h2 { margin: 0; }
+        .week-dates-label { font-size: 12px; color: #6b7280; }
+
+        .add-task-form { display: flex; flex-direction: column; gap: 0.5rem; }
+        .add-task-form input, .add-task-form select { padding: 0.625rem 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; outline: none; font-family: inherit; width: 100%; }
+        .add-task-form input:focus, .add-task-form select:focus { border-color: #667eea; }
+        .form-row { display: flex; gap: 0.5rem; }
+        .form-row select { flex: 1; }
+        .form-row input { flex: 1.5; }
+
+        .event-item { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem; background: #f9fafb; border-radius: 8px; margin-bottom: 0.5rem; }
+        .event-date { font-size: 12px; font-weight: 600; color: #667eea; white-space: nowrap; min-width: 55px; padding-top: 1px; }
+        .event-content { flex: 1; }
+        .event-title-text { font-size: 14px; font-weight: 500; color: #1f2937; }
+        .event-desc { font-size: 12px; color: #6b7280; margin-top: 0.2rem; }
+
+        .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+        .metric-card { background: #f9fafb; border-radius: 10px; padding: 0.875rem 0.5rem; text-align: center; }
+        .metric-icon { font-size: 20px; margin-bottom: 0.4rem; }
+        .metric-card input { width: 100%; text-align: center; border: 1px solid #e5e7eb; border-radius: 6px; padding: 0.4rem 0.25rem; font-size: 15px; font-weight: 700; color: #1f2937; background: white; outline: none; }
+        .metric-card input:focus { border-color: #667eea; }
+        .metric-value { font-size: 16px; font-weight: 700; color: #667eea; }
+        .metric-label { font-size: 11px; color: #9ca3af; margin-top: 0.3rem; }
+
+        .insight-textarea { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; line-height: 1.5; resize: vertical; font-family: inherit; outline: none; }
+        .insight-textarea:focus { border-color: #667eea; }
+        .insight-saved { border-color: #10b981 !important; }
+
+        .summary-stat { margin-bottom: 1rem; }
+        .summary-stat-row { display: flex; justify-content: space-between; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 0.4rem; }
+        .motivation-box { text-align: center; padding: 1rem; background: linear-gradient(135deg, #f0f4ff, #f5f0ff); border-radius: 10px; }
+        .motivation-text { font-size: 15px; color: #374151; line-height: 1.6; }
+
+        .goal-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: #f9fafb; border-radius: 8px; margin-bottom: 0.5rem; }
+        .goal-check { color: #10b981; font-weight: 700; flex-shrink: 0; }
+        .goal-text { flex: 1; font-size: 14px; color: #1f2937; }
+        .empty-text { color: #9ca3af; font-style: italic; font-size: 13px; padding: 0.25rem 0; }
+        .sprint-meta { font-size: 12px; opacity: 0.8; margin-top: 0.25rem; }
+
+        .screen-center { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; gap: 1rem; color: #6b7280; text-align: center; padding: 2rem; }
+        .spinner { width: 40px; height: 40px; border: 3px solid #e5e7eb; border-top-color: #667eea; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: #1f2937; color: white; padding: 0.75rem 1.25rem; border-radius: 8px; font-size: 13px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
+        .toast.show { opacity: 1; }
     </style>
 </head>
 <body>
-    <div id="root">
-        <div class="app">
-            <div class="app-header">
-                <h1>📋 Personal Planner</h1>
-                <p>Управляйте спринтами, неделями и ежедневными задачами</p>
+<div id="app">
+    <header class="app-header">
+        <h1>📋 Personal Planner</h1>
+        <p>Управляйте спринтами, неделями и задачами</p>
+    </header>
+    <nav class="app-nav">
+        <button class="nav-button" data-view="sprint" onclick="switchView('sprint')">
+            <span class="icon">🎯</span><span>Спринт</span>
+        </button>
+        <button class="nav-button" data-view="week" onclick="switchView('week')">
+            <span class="icon">📅</span><span>Неделя</span>
+        </button>
+        <button class="nav-button active" data-view="daily" onclick="switchView('daily')">
+            <span class="icon">📝</span><span>Сегодня</span>
+        </button>
+    </nav>
+    <main class="app-content">
+        <div id="view-content"></div>
+    </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== UTILS =====
+function todayStr() {
+    const d = new Date();
+    return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());
+}
+function p2(n) { return String(n).padStart(2,'0'); }
+function localDate(s) { const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+function fmtDate(s,opts) { return localDate(s).toLocaleDateString('ru-RU',opts||{}); }
+function getMondayStr() {
+    const d=new Date(), day=d.getDay(), diff=day===0?-6:1-day, m=new Date(d);
+    m.setDate(d.getDate()+diff);
+    return m.getFullYear()+'-'+p2(m.getMonth()+1)+'-'+p2(m.getDate());
+}
+function getSundayStr(mon) {
+    const m=localDate(mon); m.setDate(m.getDate()+6);
+    return m.getFullYear()+'-'+p2(m.getMonth()+1)+'-'+p2(m.getDate());
+}
+function newId() { return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function esc(s) { const d=document.createElement('div'); d.textContent=String(s||''); return d.innerHTML; }
+
+// ===== TOAST =====
+let toastT;
+function showToast(msg) {
+    const t=document.getElementById('toast');
+    t.textContent=msg; t.classList.add('show');
+    clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ===== API =====
+async function apiGet(path) {
+    const r=await fetch(path);
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return r.json();
+}
+async function apiPost(path,body) {
+    const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return r.json();
+}
+
+// Привычки-шаблон хранится в localStorage — для переноса между днями
+function getHabitTpl()   { try { return JSON.parse(localStorage.getItem('pp_ht_'+USER_ID))||[]; } catch { return []; } }
+function saveHabitTpl(v) { localStorage.setItem('pp_ht_'+USER_ID, JSON.stringify(v)); }
+
+// ===== STATE =====
+let USER_ID=null;
+const D={sprint:null,week:null,daily:null};
+const UI={view:'daily',showSummary:false};
+
+// ===== LOAD =====
+function showLoading() {
+    document.getElementById('view-content').innerHTML=
+        '<div class="screen-center"><div class="spinner"></div><p>Загружаю данные...</p></div>';
+}
+function showErrorScreen() {
+    document.getElementById('view-content').innerHTML=
+        '<div class="screen-center"><p style="font-size:2rem;">⚠️</p><p>Не удалось подключиться к серверу</p><button class="btn-primary" style="margin-top:1rem;width:auto;padding:.75rem 2rem;" onclick="loadAllData()">Повторить</button></div>';
+}
+
+async function loadAllData() {
+    showLoading();
+    try {
+        const [sprint,week,daily]=await Promise.all([
+            apiGet('/api/sprint/'+USER_ID),
+            apiGet('/api/week/current/'+USER_ID),
+            apiGet('/api/daily-task/'+USER_ID+'/'+todayStr())
+        ]);
+        D.sprint=sprint;
+        D.week=week;
+        if(!daily) {
+            const habits=getHabitTpl().map(h=>({id:h.id,name:h.name,completed:false,streak:h.streak||0}));
+            D.daily=await apiPost('/api/daily-task',{
+                userId:USER_ID,date:todayStr(),mainTasks:[],habits,
+                metrics:{water:0,steps:0,calories:0},insight:''
+            });
+        } else {
+            D.daily=daily;
+            if(daily.habits&&daily.habits.length) saveHabitTpl(daily.habits.map(h=>({id:h.id,name:h.name,streak:h.streak||0})));
+        }
+        render();
+    } catch(e) {
+        console.error(e);
+        showErrorScreen();
+    }
+}
+
+// ===== SYNC (оптимистичное обновление: UI сразу, API в фоне) =====
+async function syncSprint() {
+    if(!D.sprint) return;
+    try {
+        const r=await apiPost('/api/sprint',{
+            userId:USER_ID,title:D.sprint.title,startDate:D.sprint.startDate,
+            goals:D.sprint.goals,events:D.sprint.events||[]
+        });
+        if(r&&r._id) D.sprint._id=r._id;
+    } catch { showToast('Не удалось сохранить спринт'); }
+}
+async function syncWeek() {
+    if(!D.week) return;
+    try {
+        const r=await apiPost('/api/week',{
+            userId:USER_ID,weekNumber:D.week.weekNumber,
+            startDate:D.week.startDate,endDate:D.week.endDate,tasks:D.week.tasks
+        });
+        if(r&&r._id) D.week._id=r._id;
+    } catch { showToast('Не удалось сохранить задачи недели'); }
+}
+async function syncDaily() {
+    if(!D.daily) return;
+    try {
+        const r=await apiPost('/api/daily-task',{
+            userId:USER_ID,date:todayStr(),
+            mainTasks:D.daily.mainTasks,habits:D.daily.habits,
+            metrics:D.daily.metrics,insight:D.daily.insight||''
+        });
+        if(r&&r._id) D.daily._id=r._id;
+    } catch { showToast('Не удалось сохранить'); }
+}
+
+// ===== NAV =====
+function switchView(v) {
+    UI.view=v; UI.showSummary=false;
+    document.querySelectorAll('.nav-button').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
+    render();
+}
+function render() {
+    if(UI.view==='sprint') renderSprint();
+    else if(UI.view==='week') renderWeek();
+    else renderDaily();
+}
+
+// ===== SPRINT =====
+function renderSprint() {
+    const el=document.getElementById('view-content');
+    if(!D.sprint) {
+        el.innerHTML=`
+        <div class="section">
+          <h2>🚀 Создайте ваш спринт</h2>
+          <p style="color:#6b7280;margin-bottom:1rem;font-size:14px;">90 дней для достижения больших целей</p>
+          <div class="add-task-form">
+            <input type="text" id="sp-title" placeholder="Название" value="Спринт 2026" />
+            <div style="display:flex;gap:.5rem;align-items:center;">
+              <label style="font-size:13px;color:#6b7280;white-space:nowrap;">Старт:</label>
+              <input type="date" id="sp-start" value="${todayStr()}" style="flex:1;" />
             </div>
-
-            <div class="app-nav">
-                <button class="nav-button active" onclick="switchView('sprint')">
-                    <span class="icon">🎯</span>
-                    <span>Спринт</span>
-                </button>
-                <button class="nav-button" onclick="switchView('week')">
-                    <span class="icon">📅</span>
-                    <span>Неделя</span>
-                </button>
-                <button class="nav-button" onclick="switchView('daily')">
-                    <span class="icon">📝</span>
-                    <span>Сегодня</span>
-                </button>
+            <input type="text" id="sp-goal" placeholder="Первая цель..." onkeydown="if(event.key==='Enter')createSprint()" />
+            <button class="btn-primary" onclick="createSprint()">Создать спринт</button>
+          </div>
+        </div>`;
+        return;
+    }
+    const s=D.sprint;
+    const passed=Math.max(0,Math.floor((new Date()-localDate(s.startDate))/86400000));
+    const total=Math.max(1,Math.floor((localDate(s.endDate)-localDate(s.startDate))/86400000));
+    const pct=Math.min(100,Math.floor(passed/total*100));
+    const goalsHtml=s.goals.length
+        ?s.goals.map((g,i)=>`<div class="goal-item"><span class="goal-check">✓</span><span class="goal-text">${esc(g)}</span><button class="delete-btn" onclick="removeGoal(${i})">✕</button></div>`).join('')
+        :'<p class="empty-text">Целей пока нет</p>';
+    const evHtml=s.events&&s.events.length
+        ?[...s.events].sort((a,b)=>String(a.date).localeCompare(String(b.date))).map((ev,i)=>`
+          <div class="event-item">
+            <div class="event-date">${fmtDate(typeof ev.date==='string'?ev.date.slice(0,10):new Date(ev.date).toISOString().slice(0,10),{day:'numeric',month:'short'})}</div>
+            <div class="event-content">
+              <div class="event-title-text">${esc(ev.title)}</div>
+              ${ev.description?`<div class="event-desc">${esc(ev.description)}</div>`:''}
             </div>
-
-            <div class="app-content">
-                <!-- SPRINT VIEW -->
-                <div id="sprint-view" style="display: block;">
-                    <div class="section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
-                        <h2 style="color: white; margin: 0 0 1rem 0;">🎯 Спринт 2026</h2>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 45%;"></div>
-                        </div>
-                        <p style="margin: 0; opacity: 0.9; font-size: 12px;">День 40/90 • 45%</p>
-                        <p style="margin: 0.5rem 0 0 0; opacity: 0.8; font-size: 12px;">01.01.2026 — 31.03.2026</p>
-                    </div>
-
-                    <div class="section">
-                        <h2>🎯 Глобальные цели</h2>
-                        <div id="goals-list">
-                            <div class="item">
-                                <span style="color: #10b981;">✓</span>
-                                <span class="item-text">Завершить 90-дневный спринт</span>
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <input type="text" id="goal-input" placeholder="Добавить новую цель..." />
-                            <button onclick="addGoal()">Добавить</button>
-                        </div>
-                    </div>
-
-                    <div class="section">
-                        <h2>📅 События спринта</h2>
-                        <p style="color: #9ca3af; font-style: italic; margin: 0;">Событий пока нет</p>
-                    </div>
-                </div>
-
-                <!-- WEEK VIEW -->
-                <div id="week-view" style="display: none;">
-                    <div class="section">
-                        <h2>📅 Неделя 6</h2>
-                        <p style="color: #6b7280; font-size: 12px; margin: 0 0 1rem 0;">01 февр — 07 февр</p>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 60%;"></div>
-                        </div>
-                        <p style="margin: 0; font-size: 12px; color: #6b7280;">Выполнено: 3/5</p>
-                    </div>
-
-                    <div class="section">
-                        <h2>Задачи недели</h2>
-                        <div id="tasks-list">
-                            <div class="item">
-                                <input type="checkbox" />
-                                <span class="item-text">Завершить спринт</span>
-                                <span style="font-size: 10px; color: #ef4444;">⭐</span>
-                            </div>
-                            <div class="item">
-                                <input type="checkbox" checked />
-                                <span class="item-text" style="text-decoration: line-through; opacity: 0.6;">Подготовить отчет</span>
-                                <span style="font-size: 10px; color: #f59e0b;">●</span>
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <input type="text" placeholder="Новая задача..." />
-                            <button>Добавить</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- DAILY VIEW -->
-                <div id="daily-view" style="display: none;">
-                    <div class="section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
-                        <h2 style="color: white; margin: 0 0 0.5rem 0;">📝 Пятница, 15 мая</h2>
-                        <p style="margin: 0; font-size: 12px; opacity: 0.9;">15.05.2026</p>
-                    </div>
-
-                    <div class="section">
-                        <h2>🎯 Главные задачи (макс. 5)</h2>
-                        <div id="main-tasks-list">
-                            <div class="item">
-                                <input type="checkbox" />
-                                <span class="item-text">Завершить приложение</span>
-                            </div>
-                            <div class="item">
-                                <input type="checkbox" checked />
-                                <span class="item-text" style="text-decoration: line-through; opacity: 0.6;">Развернуть на сервер</span>
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <input type="text" placeholder="Новая задача..." />
-                            <button>Добавить</button>
-                        </div>
-                    </div>
-
-                    <div class="section">
-                        <h2>⭐ Привычки</h2>
-                        <div class="item">
-                            <input type="checkbox" />
-                            <span class="item-text">Медитация</span>
-                            <span style="font-size: 12px; background: #fef3c7; color: #d97706; padding: 4px 8px; border-radius: 6px; font-weight: 600;">🔥 7</span>
-                        </div>
-                        <div class="input-group">
-                            <input type="text" placeholder="Новая привычка..." />
-                            <button>Добавить</button>
-                        </div>
-                    </div>
-
-                    <div class="section">
-                        <h2>📊 Метрики</h2>
-                        <div class="stats">
-                            <div class="stat">
-                                <div style="font-size: 20px;">💧</div>
-                                <input type="number" min="0" value="2.5" style="width: 100%; margin: 0.5rem 0; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px;" />
-                                <div class="stat-label">Вода (л)</div>
-                            </div>
-                            <div class="stat">
-                                <div style="font-size: 20px;">👟</div>
-                                <input type="number" min="0" value="5000" style="width: 100%; margin: 0.5rem 0; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px;" />
-                                <div class="stat-label">Шаги</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="section">
-                        <h2>💡 Инсайт дня</h2>
-                        <textarea placeholder="Что вы узнали сегодня?" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;" rows="3"></textarea>
-                        <button style="margin-top: 1rem; width: 100%; padding: 0.75rem; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">Сохранить инсайт</button>
-                    </div>
-
-                    <button style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px; margin-top: 1rem;">📊 Подвести итоги дня</button>
-                </div>
-            </div>
-        </div>
+            <button class="delete-btn" onclick="removeEvent(${i})">✕</button>
+          </div>`).join('')
+        :'<p class="empty-text">Событий пока нет</p>';
+    el.innerHTML=`
+    <div class="section gradient-section">
+      <h2>🎯 ${esc(s.title)}</h2>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <p class="progress-text">День ${Math.min(passed,total)} / ${total} &nbsp;•&nbsp; ${pct}%</p>
+      <p class="sprint-meta">${fmtDate(s.startDate.slice?s.startDate.slice(0,10):new Date(s.startDate).toISOString().slice(0,10),{day:'numeric',month:'long'})} — ${fmtDate(s.endDate.slice?s.endDate.slice(0,10):new Date(s.endDate).toISOString().slice(0,10),{day:'numeric',month:'long'})}</p>
     </div>
+    <div class="section">
+      <h2>🎯 Глобальные цели</h2>
+      <div id="goals-list">${goalsHtml}</div>
+      <div class="input-group" style="margin-top:.75rem;">
+        <input type="text" id="goal-input" placeholder="Добавить цель..." onkeydown="if(event.key==='Enter')addGoal()" />
+        <button onclick="addGoal()">Добавить</button>
+      </div>
+    </div>
+    <div class="section">
+      <h2>📅 События спринта</h2>
+      <div id="events-list">${evHtml}</div>
+      <div style="margin-top:.875rem;">
+        <div class="input-group">
+          <input type="date" id="ev-date" style="max-width:150px;" />
+          <input type="text" id="ev-title" placeholder="Название события" onkeydown="if(event.key==='Enter')addEvent()" />
+        </div>
+        <div class="input-group">
+          <input type="text" id="ev-desc" placeholder="Описание (необязательно)" onkeydown="if(event.key==='Enter')addEvent()" />
+          <button onclick="addEvent()">Добавить</button>
+        </div>
+      </div>
+    </div>`;
+}
+function createSprint() {
+    const title=document.getElementById('sp-title').value.trim()||'Спринт 2026';
+    const startDate=document.getElementById('sp-start').value||todayStr();
+    const goal=document.getElementById('sp-goal').value.trim();
+    const end=localDate(startDate); end.setDate(end.getDate()+90);
+    const endDate=end.getFullYear()+'-'+p2(end.getMonth()+1)+'-'+p2(end.getDate());
+    D.sprint={title,startDate,endDate,goals:goal?[goal]:[],events:[]};
+    render(); syncSprint();
+}
+function addGoal() {
+    const inp=document.getElementById('goal-input');
+    const g=inp&&inp.value.trim(); if(!g||!D.sprint) return;
+    D.sprint.goals.push(g); inp.value=''; render(); syncSprint();
+}
+function removeGoal(i) {
+    if(!D.sprint) return; D.sprint.goals.splice(i,1); render(); syncSprint();
+}
+function addEvent() {
+    const date=document.getElementById('ev-date').value;
+    const title=document.getElementById('ev-title').value.trim();
+    if(!date||!title){showToast('Укажите дату и название');return;}
+    if(!D.sprint) return;
+    if(!D.sprint.events) D.sprint.events=[];
+    D.sprint.events.push({id:newId(),date,title,description:document.getElementById('ev-desc').value.trim()});
+    document.getElementById('ev-date').value='';
+    document.getElementById('ev-title').value='';
+    document.getElementById('ev-desc').value='';
+    render(); syncSprint();
+}
+function removeEvent(i) {
+    if(!D.sprint||!D.sprint.events) return;
+    D.sprint.events.splice(i,1); render(); syncSprint();
+}
 
-    <script>
-        function switchView(view) {
-            // Скрыть все вьюхи
-            document.getElementById('sprint-view').style.display = 'none';
-            document.getElementById('week-view').style.display = 'none';
-            document.getElementById('daily-view').style.display = 'none';
+// ===== WEEK =====
+function renderWeek() {
+    const mon=getMondayStr(), el=document.getElementById('view-content');
+    if(!D.week) {
+        el.innerHTML=`
+        <div class="section">
+          <h2>📅 Новая неделя</h2>
+          <p style="color:#6b7280;margin-bottom:1rem;font-size:14px;">Добавьте первую задачу, чтобы начать неделю</p>
+          <div class="add-task-form">
+            <input type="text" id="wt-title" placeholder="Первая задача недели..." onkeydown="if(event.key==='Enter')addWeekTask()" />
+            <div class="form-row">
+              <select id="wt-priority"><option value="high">⭐ Высокий</option><option value="medium" selected>● Средний</option><option value="low">○ Низкий</option></select>
+              <input type="text" id="wt-cat" placeholder="Категория" />
+            </div>
+            <button class="btn-primary" onclick="addWeekTask()">Создать неделю</button>
+          </div>
+        </div>`;
+        return;
+    }
+    const w=D.week, done=w.tasks.filter(t=>t.completed).length, total=w.tasks.length;
+    const pct=total>0?Math.floor(done/total*100):0;
+    const grouped={};
+    w.tasks.forEach((t,i)=>{const c=t.category||'Общее';if(!grouped[c])grouped[c]=[];grouped[c].push({...t,_i:i});});
+    const po={high:0,medium:1,low:2},pi={high:'⭐',medium:'●',low:'○'};
+    const tasksHtml=Object.entries(grouped).map(([cat,tasks])=>{
+        const sorted=[...tasks].sort((a,b)=>(po[a.priority]||1)-(po[b.priority]||1));
+        return `<div class="task-category">
+          <div class="category-title">${esc(cat)}</div>
+          ${sorted.map(t=>`<div class="task-item ${t.completed?'completed':''}">
+            <input type="checkbox" ${t.completed?'checked':''} onchange="toggleWeekTask(${t._i})" />
+            <span class="task-text">${esc(t.title)}</span>
+            <span class="priority-badge priority-${t.priority}">${pi[t.priority]||'●'}</span>
+            <button class="delete-btn" onclick="deleteWeekTask(${t._i})">✕</button>
+          </div>`).join('')}
+        </div>`;
+    }).join('')||'<p class="empty-text">Задач пока нет</p>';
+    el.innerHTML=`
+    <div class="section">
+      <div class="week-title-row">
+        <h2>📅 Неделя ${w.weekNumber}</h2>
+        <span class="week-dates-label">${fmtDate(mon,{day:'numeric',month:'short'})} — ${fmtDate(getSundayStr(mon),{day:'numeric',month:'short'})}</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <p class="progress-text">Выполнено: ${done} / ${total}</p>
+    </div>
+    <div class="section">
+      ${tasksHtml}
+      <div class="add-task-form" style="margin-top:1rem;padding-top:1rem;border-top:1px solid #f3f4f6;">
+        <input type="text" id="wt-title" placeholder="Новая задача..." onkeydown="if(event.key==='Enter')addWeekTask()" />
+        <div class="form-row">
+          <select id="wt-priority"><option value="high">⭐ Высокий</option><option value="medium" selected>● Средний</option><option value="low">○ Низкий</option></select>
+          <input type="text" id="wt-cat" placeholder="Категория" />
+        </div>
+        <button class="btn-primary" onclick="addWeekTask()">Добавить задачу</button>
+      </div>
+    </div>`;
+}
+function addWeekTask() {
+    const tEl=document.getElementById('wt-title'), title=tEl&&tEl.value.trim(); if(!title) return;
+    const priority=document.getElementById('wt-priority').value;
+    const category=document.getElementById('wt-cat').value.trim()||'Общее';
+    const mon=getMondayStr();
+    if(!D.week) {
+        const wn=D.sprint?Math.max(1,Math.ceil((new Date()-localDate(D.sprint.startDate))/(7*86400000))):1;
+        D.week={weekNumber:wn,startDate:mon,endDate:getSundayStr(mon),tasks:[]};
+    }
+    D.week.tasks.push({id:newId(),title,priority,category,completed:false});
+    if(tEl) tEl.value=''; render(); syncWeek();
+}
+function toggleWeekTask(i) { if(!D.week) return; D.week.tasks[i].completed=!D.week.tasks[i].completed; render(); syncWeek(); }
+function deleteWeekTask(i) { if(!D.week) return; D.week.tasks.splice(i,1); render(); syncWeek(); }
 
-            // Обновить активную кнопку
-            document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
-            event.target.closest('.nav-button').classList.add('active');
+// ===== DAILY =====
+function renderDaily() {
+    if(UI.showSummary){renderSummary();return;}
+    const d=D.daily, el=document.getElementById('view-content');
+    const date=localDate(todayStr());
+    const dateLabel=date.toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'});
+    const done=d?d.mainTasks.filter(t=>t.completed).length:0, total=d?d.mainTasks.length:0;
+    const pct=total>0?Math.floor(done/total*100):0;
+    const tasksHtml=d&&total
+        ?d.mainTasks.map((t,i)=>`<div class="task-item ${t.completed?'completed':''}">
+            <input type="checkbox" ${t.completed?'checked':''} onchange="toggleDailyTask(${i})" />
+            <span class="task-text">${esc(t.title)}</span>
+            <button class="delete-btn" onclick="deleteDailyTask(${i})">✕</button>
+          </div>`).join('')
+        :'<p class="empty-text">Задач пока нет</p>';
+    const habitsHtml=d&&d.habits.length
+        ?d.habits.map((h,i)=>`<div class="habit-item ${h.completed?'completed':''}">
+            <input type="checkbox" ${h.completed?'checked':''} onchange="toggleHabit(${i})" />
+            <span class="habit-text">${esc(h.name)}</span>
+            ${h.streak>0?`<span class="streak-badge">🔥 ${h.streak}</span>`:''}
+            <button class="delete-btn" onclick="deleteHabit(${i})">✕</button>
+          </div>`).join('')
+        :'<p class="empty-text">Привычек пока нет</p>';
+    const m=d?d.metrics:{water:0,steps:0,calories:0};
+    el.innerHTML=`
+    <div class="section gradient-section">
+      <h2 style="text-transform:capitalize;">${dateLabel}</h2>
+      ${total>0?`<div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div><p class="progress-text">Задач выполнено: ${done} / ${total}</p>`:''}
+    </div>
+    <div class="section">
+      <h2>🎯 Главные задачи <span style="font-size:12px;font-weight:400;color:#9ca3af;">(макс. 5)</span></h2>
+      ${tasksHtml}
+      ${!d||total<5?`<div class="input-group" style="margin-top:.75rem;"><input type="text" id="new-task" placeholder="Новая задача..." onkeydown="if(event.key==='Enter')addDailyTask()" /><button onclick="addDailyTask()">Добавить</button></div>`:`<p style="color:#9ca3af;font-size:12px;margin-top:.5rem;">Максимум 5 задач на день</p>`}
+    </div>
+    <div class="section">
+      <h2>⭐ Привычки</h2>
+      ${habitsHtml}
+      <div class="input-group" style="margin-top:.75rem;">
+        <input type="text" id="new-habit" placeholder="Новая привычка..." onkeydown="if(event.key==='Enter')addHabit()" />
+        <button onclick="addHabit()">Добавить</button>
+      </div>
+    </div>
+    <div class="section">
+      <h2>📊 Метрики</h2>
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-icon">💧</div>
+          <input type="number" min="0" step="0.5" value="${m.water}" onchange="updateMetric('water',parseFloat(this.value)||0)" oninput="updateMetric('water',parseFloat(this.value)||0)" />
+          <div class="metric-label">Вода (л)</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon">👟</div>
+          <input type="number" min="0" step="500" value="${m.steps}" onchange="updateMetric('steps',parseInt(this.value)||0)" oninput="updateMetric('steps',parseInt(this.value)||0)" />
+          <div class="metric-label">Шаги</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon">🔥</div>
+          <input type="number" min="0" step="50" value="${m.calories}" onchange="updateMetric('calories',parseInt(this.value)||0)" oninput="updateMetric('calories',parseInt(this.value)||0)" />
+          <div class="metric-label">Ккал</div>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>💡 Инсайт дня</h2>
+      <textarea class="insight-textarea" id="insight-text" rows="3" placeholder="Что вы узнали сегодня?">${esc(d&&d.insight||'')}</textarea>
+      <button class="btn-secondary" style="margin-top:.5rem;" onclick="saveInsight()">Сохранить инсайт</button>
+    </div>
+    <button class="btn-primary" style="margin-bottom:1rem;" onclick="showSummary()">📊 Подвести итоги дня</button>`;
+}
+function renderSummary() {
+    const d=D.daily, el=document.getElementById('view-content');
+    const doneTasks=d?d.mainTasks.filter(t=>t.completed).length:0, totalTasks=d?d.mainTasks.length:0;
+    const doneHabits=d?d.habits.filter(h=>h.completed).length:0,  totalHabits=d?d.habits.length:0;
+    const tPct=totalTasks>0?Math.floor(doneTasks/totalTasks*100):0;
+    const hPct=totalHabits>0?Math.floor(doneHabits/totalHabits*100):0;
+    const m=d?d.metrics:{water:0,steps:0,calories:0};
+    const MOTS=['🌟 Каждый выполненный день — шаг к вашей мечте!','💪 Отличный прогресс! Продолжайте!','🔥 Ваша серия растёт!','✨ Вы уже ближе к своим целям!','🚀 Маленькие шаги ведут к большим результатам!','🎯 Помните, почему вы начали!'];
+    const mot=MOTS[Math.floor(Math.random()*MOTS.length)];
+    el.innerHTML=`
+    <div class="section gradient-section"><h2>📊 Итоги дня</h2></div>
+    <div class="section">
+      <div class="summary-stat"><div class="summary-stat-row"><span>✅ Задачи</span><span>${doneTasks} / ${totalTasks}</span></div><div class="progress-bar"><div class="progress-fill" style="width:${tPct}%"></div></div></div>
+      <div class="summary-stat"><div class="summary-stat-row"><span>⭐ Привычки</span><span>${doneHabits} / ${totalHabits}</span></div><div class="progress-bar"><div class="progress-fill" style="width:${hPct}%"></div></div></div>
+      <div class="metrics-grid" style="margin-top:1rem;">
+        <div class="metric-card"><div class="metric-icon">💧</div><div class="metric-value">${m.water}л</div><div class="metric-label">Вода</div></div>
+        <div class="metric-card"><div class="metric-icon">👟</div><div class="metric-value">${m.steps}</div><div class="metric-label">Шаги</div></div>
+        <div class="metric-card"><div class="metric-icon">🔥</div><div class="metric-value">${m.calories}</div><div class="metric-label">Ккал</div></div>
+      </div>
+    </div>
+    <div class="section"><div class="motivation-box"><p class="motivation-text">${mot}</p></div></div>
+    ${d&&d.insight?`<div class="section"><h2>💡 Инсайт дня</h2><p style="font-size:14px;color:#374151;line-height:1.6;">${esc(d.insight)}</p></div>`:''}
+    <div class="section"><p style="text-align:center;font-size:15px;">😴 Хорошо поспите! Завтра новый день для новых побед!</p></div>
+    <button class="btn-secondary" style="margin-bottom:1rem;" onclick="hideSummary()">← Вернуться к дню</button>`;
+}
 
-            // Показать выбранную вьюху
-            document.getElementById(view + '-view').style.display = 'block';
-        }
+function addDailyTask() {
+    const inp=document.getElementById('new-task'), title=inp&&inp.value.trim();
+    if(!title||!D.daily) return;
+    if(D.daily.mainTasks.length>=5) return;
+    D.daily.mainTasks.push({id:newId(),title,completed:false});
+    if(inp) inp.value=''; render(); syncDaily();
+}
+function deleteDailyTask(i) { if(!D.daily) return; D.daily.mainTasks.splice(i,1); render(); syncDaily(); }
+function toggleDailyTask(i) { if(!D.daily) return; D.daily.mainTasks[i].completed=!D.daily.mainTasks[i].completed; render(); syncDaily(); }
+function addHabit() {
+    const inp=document.getElementById('new-habit'), name=inp&&inp.value.trim();
+    if(!name||!D.daily) return;
+    const h={id:newId(),name,completed:false,streak:0};
+    D.daily.habits.push(h);
+    const tpl=getHabitTpl(); tpl.push({id:h.id,name,streak:0}); saveHabitTpl(tpl);
+    if(inp) inp.value=''; render(); syncDaily();
+}
+function deleteHabit(i) {
+    if(!D.daily) return;
+    const id=D.daily.habits[i].id;
+    D.daily.habits.splice(i,1);
+    saveHabitTpl(getHabitTpl().filter(h=>h.id!==id));
+    render(); syncDaily();
+}
+function toggleHabit(i) {
+    if(!D.daily) return;
+    const h=D.daily.habits[i]; h.completed=!h.completed;
+    const tpl=getHabitTpl(), t=tpl.find(x=>x.id===h.id);
+    if(h.completed){h.streak=(t?t.streak:h.streak)+1;}
+    else{h.streak=Math.max(0,(t?t.streak:h.streak)-1);}
+    if(t) t.streak=h.streak; saveHabitTpl(tpl);
+    render(); syncDaily();
+}
+function updateMetric(field,val) { if(!D.daily) return; D.daily.metrics[field]=val; syncDaily(); }
+function saveInsight() {
+    const ta=document.getElementById('insight-text'); if(!ta||!D.daily) return;
+    D.daily.insight=ta.value;
+    ta.classList.add('insight-saved'); setTimeout(()=>ta.classList.remove('insight-saved'),1200);
+    syncDaily();
+}
+function showSummary(){UI.showSummary=true;renderDaily();}
+function hideSummary(){UI.showSummary=false;renderDaily();}
 
-        function addGoal() {
-            const input = document.getElementById('goal-input');
-            if (input.value.trim()) {
-                const goalsList = document.getElementById('goals-list');
-                const newGoal = document.createElement('div');
-                newGoal.className = 'item';
-                newGoal.innerHTML = `
-                    <span style="color: #10b981;">✓</span>
-                    <span class="item-text">${input.value}</span>
-                `;
-                goalsList.appendChild(newGoal);
-                input.value = '';
-            }
-        }
-
-        // Инициализация Telegram Web App
-        if (window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.ready();
-            window.Telegram.WebApp.expand();
-            window.Telegram.WebApp.setHeaderColor('#1f2937');
-        }
-    </script>
+// ===== INIT =====
+function init() {
+    const params=new URLSearchParams(window.location.search);
+    let uid=params.get('user_id');
+    if(!uid&&window.Telegram&&window.Telegram.WebApp) {
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand();
+        const u=window.Telegram.WebApp.initDataUnsafe&&window.Telegram.WebApp.initDataUnsafe.user;
+        if(u) uid=String(u.id);
+    }
+    if(!uid) {
+        uid=localStorage.getItem('pp_local_uid');
+        if(!uid){uid='local_'+Date.now().toString(36);localStorage.setItem('pp_local_uid',uid);}
+    }
+    USER_ID=uid;
+    loadAllData();
+}
+document.addEventListener('DOMContentLoaded',init);
+</script>
 </body>
 </html>
