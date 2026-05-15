@@ -261,9 +261,7 @@ async function loadAllData() {
 
         if (!daily) {
             const habits = getHabitTpl().map(h => ({ id:h.id, name:h.name, completed:false, streak:h.streak||0 }));
-            const res = await apiPost('/api/daily-task', { userId:USER_ID, date:todayStr(), mainTasks:[], habits, metrics:{water:0,steps:0,calories:0}, insight:'' });
-            D.daily = res;
-            if (res.userStats) updateStatsBar(res.userStats);
+            D.daily = await apiPost('/api/daily-task', { userId:USER_ID, date:todayStr(), mainTasks:[], habits, metrics:{water:0,steps:0,calories:0}, insight:'' });
         } else {
             D.daily = daily;
             if (daily.habits && daily.habits.length) saveHabitTpl(daily.habits.map(h => ({ id:h.id, name:h.name, streak:h.streak||0 })));
@@ -299,12 +297,15 @@ async function syncDaily(xpHint) {
             metrics:D.daily.metrics, insight:D.daily.insight||''
         });
         if (r && r._id) D.daily._id = r._id;
-        if (r && r.userStats) {
-            checkLevelUp(r.userStats);
-            updateStatsBar(r.userStats);
-        }
         if (xpHint) showXpPopup(xpHint, document.getElementById('view-content'));
-    } catch { showToast('Не удалось сохранить'); }
+        // Обновляем статистику отдельным запросом (не блокирует сохранение)
+        apiGet('/api/user-stats/'+USER_ID).then(stats => {
+            if (stats) { checkLevelUp(stats); updateStatsBar(stats); }
+        }).catch(() => {});
+    } catch(e) {
+        console.error('syncDaily error:', e);
+        showToast('⚠️ Не удалось сохранить данные (код: ' + (e.status||'?') + ')');
+    }
 }
 
 // ===== NAV =====

@@ -282,9 +282,11 @@ app.post('/api/daily-task', async (req, res) => {
       { upsert: true, new: true }
     );
 
-    // Обновляем статистику пользователя в фоне, возвращаем свежие данные
-    const userStats = await updateUserStats(userId);
-    res.json({ ...dailyTask.toObject(), userStats });
+    // Отвечаем сразу — сохранение данных критично, статистика второстепенна
+    res.json(dailyTask);
+
+    // Обновляем XP/стрик в фоне, не блокируя ответ
+    updateUserStats(userId).catch(e => console.error('updateUserStats:', e.message));
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
