@@ -466,6 +466,16 @@ async function sendEveningSummary() {
 setInterval(sendMorningReminders, 60000);
 setInterval(sendEveningSummary, 60000);
 
+// В конце файла, ПЕРЕД app.listen():
+
+// Раздаём статику из папки public/
+app.use(express.static('public'));
+
+// Для всех остальных маршрутов отправляем index.html
+app.get('*', (req, res) => {'{'}
+  res.sendFile(__dirname + '/public/index.html');
+{'}'});
+
 // ===== ЗАПУСК СЕРВЕРА =====
 
 const PORT = process.env.PORT || 3000;
