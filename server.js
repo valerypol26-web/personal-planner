@@ -405,6 +405,8 @@ async function initTelegramBot() {
     const railwayDomain = process.env.RAILWAY_PUBLIC_DOMAIN;
     if (railwayDomain) {
       bot = new TelegramBot(token);
+      bot.on('error', (err) => console.error('Bot error:', err.message));
+      bot.on('webhook_error', (err) => console.error('Webhook error:', err.message));
       await bot.setWebHook(`https://${railwayDomain}/telegram-webhook`);
       console.log('✅ Telegram Bot webhook активен');
     } else {
@@ -457,5 +459,6 @@ async function sendEveningSummary() {
 }
 
 process.on('unhandledRejection', (reason) => { console.error('Unhandled rejection:', reason); });
+process.on('uncaughtException', (err) => { console.error('Uncaught exception:', err.message); });
 
 module.exports = { app };
