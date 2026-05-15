@@ -30,12 +30,351 @@
             font-size: 16px;
             color: #6b7280;
         }
+        .app {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0;
+            background: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .app-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .app-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .app-header p {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 1rem;
+        }
+        .app-nav {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: #e5e7eb;
+            padding: 1px;
+            border-bottom: 1px solid #d1d5db;
+        }
+        .nav-button {
+            padding: 1rem;
+            border: none;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #6b7280;
+            transition: all 0.3s ease;
+        }
+        .nav-button.active {
+            background: #f3f4f6;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+        .nav-button .icon {
+            font-size: 20px;
+        }
+        .app-content {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        .section {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .section h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+        .input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .input-group input,
+        .input-group textarea {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .input-group button {
+            padding: 0.75rem 1.5rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .input-group button:hover {
+            background: #5568d3;
+        }
+        .item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            background: #f9fafb;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+        .item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        .item-text {
+            flex: 1;
+            font-size: 14px;
+            color: #1f2937;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .stat {
+            background: #f3f4f6;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 0.5rem;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
     </style>
 </head>
 <body>
     <div id="root">
-        <div class="loading">Загружаю приложение...</div>
+        <div class="app">
+            <div class="app-header">
+                <h1>📋 Personal Planner</h1>
+                <p>Управляйте спринтами, неделями и ежедневными задачами</p>
+            </div>
+
+            <div class="app-nav">
+                <button class="nav-button active" onclick="switchView('sprint')">
+                    <span class="icon">🎯</span>
+                    <span>Спринт</span>
+                </button>
+                <button class="nav-button" onclick="switchView('week')">
+                    <span class="icon">📅</span>
+                    <span>Неделя</span>
+                </button>
+                <button class="nav-button" onclick="switchView('daily')">
+                    <span class="icon">📝</span>
+                    <span>Сегодня</span>
+                </button>
+            </div>
+
+            <div class="app-content">
+                <!-- SPRINT VIEW -->
+                <div id="sprint-view" style="display: block;">
+                    <div class="section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+                        <h2 style="color: white; margin: 0 0 1rem 0;">🎯 Спринт 2026</h2>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 45%;"></div>
+                        </div>
+                        <p style="margin: 0; opacity: 0.9; font-size: 12px;">День 40/90 • 45%</p>
+                        <p style="margin: 0.5rem 0 0 0; opacity: 0.8; font-size: 12px;">01.01.2026 — 31.03.2026</p>
+                    </div>
+
+                    <div class="section">
+                        <h2>🎯 Глобальные цели</h2>
+                        <div id="goals-list">
+                            <div class="item">
+                                <span style="color: #10b981;">✓</span>
+                                <span class="item-text">Завершить 90-дневный спринт</span>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" id="goal-input" placeholder="Добавить новую цель..." />
+                            <button onclick="addGoal()">Добавить</button>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h2>📅 События спринта</h2>
+                        <p style="color: #9ca3af; font-style: italic; margin: 0;">Событий пока нет</p>
+                    </div>
+                </div>
+
+                <!-- WEEK VIEW -->
+                <div id="week-view" style="display: none;">
+                    <div class="section">
+                        <h2>📅 Неделя 6</h2>
+                        <p style="color: #6b7280; font-size: 12px; margin: 0 0 1rem 0;">01 февр — 07 февр</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 60%;"></div>
+                        </div>
+                        <p style="margin: 0; font-size: 12px; color: #6b7280;">Выполнено: 3/5</p>
+                    </div>
+
+                    <div class="section">
+                        <h2>Задачи недели</h2>
+                        <div id="tasks-list">
+                            <div class="item">
+                                <input type="checkbox" />
+                                <span class="item-text">Завершить спринт</span>
+                                <span style="font-size: 10px; color: #ef4444;">⭐</span>
+                            </div>
+                            <div class="item">
+                                <input type="checkbox" checked />
+                                <span class="item-text" style="text-decoration: line-through; opacity: 0.6;">Подготовить отчет</span>
+                                <span style="font-size: 10px; color: #f59e0b;">●</span>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" placeholder="Новая задача..." />
+                            <button>Добавить</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DAILY VIEW -->
+                <div id="daily-view" style="display: none;">
+                    <div class="section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+                        <h2 style="color: white; margin: 0 0 0.5rem 0;">📝 Пятница, 15 мая</h2>
+                        <p style="margin: 0; font-size: 12px; opacity: 0.9;">15.05.2026</p>
+                    </div>
+
+                    <div class="section">
+                        <h2>🎯 Главные задачи (макс. 5)</h2>
+                        <div id="main-tasks-list">
+                            <div class="item">
+                                <input type="checkbox" />
+                                <span class="item-text">Завершить приложение</span>
+                            </div>
+                            <div class="item">
+                                <input type="checkbox" checked />
+                                <span class="item-text" style="text-decoration: line-through; opacity: 0.6;">Развернуть на сервер</span>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" placeholder="Новая задача..." />
+                            <button>Добавить</button>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h2>⭐ Привычки</h2>
+                        <div class="item">
+                            <input type="checkbox" />
+                            <span class="item-text">Медитация</span>
+                            <span style="font-size: 12px; background: #fef3c7; color: #d97706; padding: 4px 8px; border-radius: 6px; font-weight: 600;">🔥 7</span>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" placeholder="Новая привычка..." />
+                            <button>Добавить</button>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h2>📊 Метрики</h2>
+                        <div class="stats">
+                            <div class="stat">
+                                <div style="font-size: 20px;">💧</div>
+                                <input type="number" min="0" value="2.5" style="width: 100%; margin: 0.5rem 0; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px;" />
+                                <div class="stat-label">Вода (л)</div>
+                            </div>
+                            <div class="stat">
+                                <div style="font-size: 20px;">👟</div>
+                                <input type="number" min="0" value="5000" style="width: 100%; margin: 0.5rem 0; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px;" />
+                                <div class="stat-label">Шаги</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h2>💡 Инсайт дня</h2>
+                        <textarea placeholder="Что вы узнали сегодня?" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;" rows="3"></textarea>
+                        <button style="margin-top: 1rem; width: 100%; padding: 0.75rem; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">Сохранить инсайт</button>
+                    </div>
+
+                    <button style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px; margin-top: 1rem;">📊 Подвести итоги дня</button>
+                </div>
+            </div>
+        </div>
     </div>
-    <script src="/src/main.jsx" type="module"></script>
+
+    <script>
+        function switchView(view) {
+            // Скрыть все вьюхи
+            document.getElementById('sprint-view').style.display = 'none';
+            document.getElementById('week-view').style.display = 'none';
+            document.getElementById('daily-view').style.display = 'none';
+
+            // Обновить активную кнопку
+            document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.nav-button').classList.add('active');
+
+            // Показать выбранную вьюху
+            document.getElementById(view + '-view').style.display = 'block';
+        }
+
+        function addGoal() {
+            const input = document.getElementById('goal-input');
+            if (input.value.trim()) {
+                const goalsList = document.getElementById('goals-list');
+                const newGoal = document.createElement('div');
+                newGoal.className = 'item';
+                newGoal.innerHTML = `
+                    <span style="color: #10b981;">✓</span>
+                    <span class="item-text">${input.value}</span>
+                `;
+                goalsList.appendChild(newGoal);
+                input.value = '';
+            }
+        }
+
+        // Инициализация Telegram Web App
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.ready();
+            window.Telegram.WebApp.expand();
+            window.Telegram.WebApp.setHeaderColor('#1f2937');
+        }
+    </script>
 </body>
 </html>
