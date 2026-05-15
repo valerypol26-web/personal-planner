@@ -466,15 +466,15 @@ async function sendEveningSummary() {
 setInterval(sendMorningReminders, 60000);
 setInterval(sendEveningSummary, 60000);
 
-// В конце файла, ПЕРЕД app.listen():
+// ===== РАЗДАЧА ФРОНТЕНДА =====
 
-// Раздаём статику из папки public/
-app.use(express.static('public'));
+const path = require('path');
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Для всех остальных маршрутов отправляем index.html
-app.get('*', (req, res) => {'{'}
-  res.sendFile(__dirname + '/public/index.html');
-{'}'});
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/index.html'));
+});
 
 // ===== ЗАПУСК СЕРВЕРА =====
 
