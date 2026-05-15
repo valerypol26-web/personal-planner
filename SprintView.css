@@ -1,0 +1,174 @@
+/* SprintView.css */
+.sprint-view {
+  animation: slideIn 0.3s ease;
+}
+
+.sprint-progress {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.sprint-progress h2 {
+  font-size: 20px;
+  margin-bottom: 1rem;
+}
+
+.progress-text {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-top: 0.5rem;
+}
+
+.sprint-dates {
+  font-size: 12px;
+  opacity: 0.8;
+  margin-top: 0.5rem;
+}
+
+.sprint-section {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.sprint-section h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1f2937;
+}
+
+.goals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.goal-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.75rem;
+  background: #f3f4f6;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.goal-icon {
+  font-size: 16px;
+  color: #10b981;
+  font-weight: bold;
+}
+
+.goal-text {
+  flex: 1;
+  color: #1f2937;
+}
+
+.events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.event-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-left: 4px solid #667eea;
+  border-radius: 8px;
+}
+
+.event-date {
+  font-size: 12px;
+  font-weight: 600;
+  color: #667eea;
+  white-space: nowrap;
+  padding-top: 0.2rem;
+}
+
+.event-content {
+  flex: 1;
+}
+
+.event-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 0.25rem 0;
+}
+
+.event-description {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.add-goal,
+.add-event {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.add-event {
+  gap: 0.75rem;
+}
+
+.add-goal input,
+.add-event input,
+.add-event textarea {
+  margin-bottom: 0;
+}
+
+.add-goal button,
+.add-event button {
+  align-self: flex-start;
+}
+
+.create-sprint {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.create-sprint h2 {
+  font-size: 20px;
+  margin-bottom: 0.5rem;
+  color: #1f2937;
+}
+
+.create-sprint p {
+  color: #6b7280;
+  font-size: 14px;
+  margin-bottom: 1.5rem;
+}
+
+.create-sprint .add-goal {
+  border: none;
+  padding: 0;
+  margin-top: 1rem;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
