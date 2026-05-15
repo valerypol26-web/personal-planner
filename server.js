@@ -10,6 +10,9 @@ app.use(express.json());
 let dbConnected = false;
 let bot = null;
 
+// Не буферизовать запросы — сразу падать с ошибкой если БД недоступна
+mongoose.set('bufferCommands', false);
+
 // ===== HEALTH CHECK (отвечает всегда) =====
 
 app.get('/health', (req, res) => {
@@ -18,6 +21,17 @@ app.get('/health', (req, res) => {
     db: dbConnected ? 'connected' : 'disconnected',
     bot: bot ? 'running' : 'disabled'
   });
+});
+
+// Все /api/* запросы проверяют подключение к БД
+app.use('/api', (req, res, next) => {
+  if (!dbConnected) {
+    return res.status(503).json({
+      error: 'database_unavailable',
+      message: 'База данных недоступна. Убедитесь что MONGODB_URI задан в настройках Railway.'
+    });
+  }
+  next();
 });
 
 // ===== СХЕМЫ =====

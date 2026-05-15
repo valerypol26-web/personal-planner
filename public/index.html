@@ -157,12 +157,12 @@ function showToast(msg) {
 // ===== API =====
 async function apiGet(path) {
     const r=await fetch(path);
-    if(!r.ok) throw new Error('HTTP '+r.status);
+    if(!r.ok){const e=new Error('HTTP '+r.status);e.status=r.status;throw e;}
     return r.json();
 }
 async function apiPost(path,body) {
     const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    if(!r.ok) throw new Error('HTTP '+r.status);
+    if(!r.ok){const e=new Error('HTTP '+r.status);e.status=r.status;throw e;}
     return r.json();
 }
 
@@ -180,9 +180,10 @@ function showLoading() {
     document.getElementById('view-content').innerHTML=
         '<div class="screen-center"><div class="spinner"></div><p>Загружаю данные...</p></div>';
 }
-function showErrorScreen() {
+function showErrorScreen(msg) {
+    const text = msg || 'Не удалось загрузить данные';
     document.getElementById('view-content').innerHTML=
-        '<div class="screen-center"><p style="font-size:2rem;">⚠️</p><p>Не удалось подключиться к серверу</p><button class="btn-primary" style="margin-top:1rem;width:auto;padding:.75rem 2rem;" onclick="loadAllData()">Повторить</button></div>';
+        '<div class="screen-center"><p style="font-size:2rem;">⚠️</p><p style="font-weight:600;">'+text+'</p><p style="font-size:12px;color:#9ca3af;margin-top:.5rem;">Проверьте MONGODB_URI в Railway</p><button class="btn-primary" style="margin-top:1.25rem;width:auto;padding:.75rem 2rem;" onclick="loadAllData()">Повторить</button></div>';
 }
 
 async function loadAllData() {
@@ -208,7 +209,9 @@ async function loadAllData() {
         render();
     } catch(e) {
         console.error(e);
-        showErrorScreen();
+        let msg = 'Не удалось загрузить данные';
+        if (e && e.status === 503) msg = 'База данных недоступна';
+        showErrorScreen(msg);
     }
 }
 
