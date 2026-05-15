@@ -224,6 +224,13 @@ app.get('/api/stats/:userId/:weekId', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// ===== TELEGRAM WEBHOOK (регистрируем ДО catch-all) =====
+
+app.post('/telegram-webhook', (req, res) => {
+  if (bot) bot.processUpdate(req.body);
+  res.sendStatus(200);
+});
+
 // ===== ФРОНТЕНД =====
 
 const path = require('path');
@@ -260,6 +267,38 @@ async function initMongoDB() {
 
 // ===== ИНИЦИАЛИЗАЦИЯ TELEGRAM BOT =====
 
+function registerBotHandlers() {
+  const webAppUrl = process.env.WEBAPP_URL
+    || (process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : 'https://your-app.up.railway.app');
+
+  bot.onText(/\/start/, async (msg) => {
+    const chatId = msg.chat.id;
+    const userId = msg.from.id;
+    if (dbConnected) {
+      try {
+        await User.findOneAndUpdate(
+          { telegramId: userId },
+          { telegramId: userId, firstName: msg.from.first_name, lastName: msg.from.last_name, username: msg.from.username },
+          { upsert: true }
+        );
+      } catch (e) { console.error('DB error on /start:', e.message); }
+    }
+    bot.sendMessage(chatId,
+      '🎯 Добро пожаловать в Personal Planner!\n\n' +
+      '• 90-дневные спринты\n• Еженедельные задачи\n• Ежедневные дела\n• Привычки и метрики\n\n' +
+      'Нажмите кнопку ниже:',
+      { reply_markup: { inline_keyboard: [[{ text: '📱 Открыть приложение', web_app: { url: `${webAppUrl}?user_id=${userId}` } }]] } }
+    );
+  });
+
+  bot.onText(/\/help/, (msg) => {
+    bot.sendMessage(msg.chat.id, '📚 /start - Открыть приложение\n/help - Справка');
+  });
+
+  setInterval(sendMorningReminders, 60000);
+  setInterval(sendEveningSummary, 60000);
+}
+
 async function initTelegramBot() {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   if (!token) {
@@ -268,46 +307,29 @@ async function initTelegramBot() {
   }
   try {
     const TelegramBot = require('node-telegram-bot-api');
-    bot = new TelegramBot(token, { polling: true });
+    const railwayDomain = process.env.RAILWAY_PUBLIC_DOMAIN;
 
-    bot.on('polling_error', (err) => {
-      // 409 = другой polling уже запущен (нормально при перезапуске)
-      if (err.code !== 'ETELEGRAM' || !err.message.includes('409')) {
-        console.error('Telegram polling error:', err.message);
-      }
-    });
+    if (railwayDomain) {
+      // Webhook — надёжный режим для Railway (нет 409 при перезапуске)
+      bot = new TelegramBot(token);
+      const webhookUrl = `https://${railwayDomain}/telegram-webhook`;
+      await bot.setWebHook(webhookUrl);
+      console.log(`✅ Telegram Bot webhook активен: ${webhookUrl}`);
+    } else {
+      // Polling — только для локальной разработки
+      bot = new TelegramBot(token, { polling: true });
+      bot.on('polling_error', (err) => {
+        if (!err.message.includes('409')) {
+          console.error('Telegram polling error:', err.message);
+        }
+      });
+      console.log('✅ Telegram Bot запущен (polling)');
+    }
 
-    bot.onText(/\/start/, async (msg) => {
-      const chatId = msg.chat.id;
-      const userId = msg.from.id;
-      if (dbConnected) {
-        try {
-          await User.findOneAndUpdate(
-            { telegramId: userId },
-            { telegramId: userId, firstName: msg.from.first_name, lastName: msg.from.last_name, username: msg.from.username },
-            { upsert: true }
-          );
-        } catch (e) { console.error('DB error on /start:', e.message); }
-      }
-      const webAppUrl = process.env.WEBAPP_URL || `https://your-app.up.railway.app`;
-      bot.sendMessage(chatId,
-        '🎯 Добро пожаловать в Personal Planner!\n\n' +
-        'Это ваш персональный ассистент для управления:\n' +
-        '• 90-дневными спринтами\n• Еженедельными задачами\n• Ежедневными делами\n• Привычками и метриками\n\n' +
-        'Нажмите кнопку ниже, чтобы открыть приложение:',
-        { reply_markup: { inline_keyboard: [[{ text: '📱 Открыть приложение', web_app: { url: `${webAppUrl}?user_id=${userId}` } }]] } }
-      );
-    });
-
-    bot.onText(/\/help/, (msg) => {
-      bot.sendMessage(msg.chat.id, '📚 Справка:\n\n/start - Открыть приложение\n/help - Эта справка');
-    });
-
-    console.log('✅ Telegram Bot запущен');
-    setInterval(sendMorningReminders, 60000);
-    setInterval(sendEveningSummary, 60000);
+    registerBotHandlers();
   } catch (err) {
     console.error('❌ Telegram Bot: не удалось запустить:', err.message);
+    bot = null;
   }
 }
 
