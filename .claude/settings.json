@@ -1,0 +1,10 @@
+{
+  "extraKnownMarketplaces": {
+    "stitch": {
+      "source": {
+        "source": "github",
+        "repo": "googlelabs-code/stitch"
+      }
+    }
+  }
+}
